@@ -4,7 +4,7 @@ COPY ../requirements.txt ./app/requirements.txt
 WORKDIR /app
 
 RUN pip install -r requirements.txt
-COPY flask_PSQL.py /app/
+COPY ./flask_PSQL.py /app/
 
 ENTRYPOINT [ "python" ]
 CMD [ "flask_PSQL.py" ]

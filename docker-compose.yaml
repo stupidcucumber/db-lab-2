@@ -10,7 +10,7 @@ services:
     volumes:
       - ./MongoDB/mongodb-schema/:/docker-entrypoint-initdb.d/
     ports:
-      - 27017:27017
+      - 27018:27017
 
   flask-mongo:
     build: ./MongoDB/
