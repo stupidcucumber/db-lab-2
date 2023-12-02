@@ -9,6 +9,7 @@ CREATE TABLE users (
 CREATE TABLE groups (
     group_id SERIAL PRIMARY KEY,
     admin_id INT NOT NULL,
+    group_name VARCHAR(32),
 
     FOREIGN KEY (admin_id)
         REFERENCES users(telegram_id)
