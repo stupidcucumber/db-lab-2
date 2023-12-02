@@ -1,0 +1,37 @@
+services:
+
+  mongodb:
+    image: mongo
+    restart: always
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=mongodb
+      - MONGO_INITDB_ROOT_PASSWORD=password
+      - MONGO_INITDB=santa
+    volumes:
+      - ./MongoDB/mongodb-schema/:/docker-entrypoint-initdb.d/
+    ports:
+      - 27017:27017
+
+  flask-mongo:
+    build: ./MongoDB/
+    restart: always
+    ports:
+      - 5052:5051
+
+  postgres:
+    image: postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=santa
+    volumes:
+      - ./PostgreSQL/postgres-schema/:/docker-entrypoint-initdb.d/
+    ports:
+      - 5434:5432
+
+  flask-postgres:
+    build: ./PostgreSQL/
+    restart: always
+    ports:
+      - 5051:5051
