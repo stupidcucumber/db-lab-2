@@ -50,9 +50,9 @@ def patch_user(telegram_id: int):
     cursor.execute(
         '''
             UPDATE users
-            SET username = "%s"
-            WHERE telegram_id = %d
-        ''' % ('not_stupid', telegram_id)
+            SET username = '%s'
+            WHERE telegram_id = %d;
+        ''' % ('freddie', telegram_id)
     )
 
     database.commit()
@@ -67,10 +67,10 @@ def delete_user(telegram_id: int):
     cursor.execute(
         '''
             DELETE FROM users
-            WHERE telegram_id = %d
+            WHERE telegram_id = %d;
         ''' % telegram_id
     )
-
+    print(telegram_id)
     database.commit()
     cursor.close()
 
