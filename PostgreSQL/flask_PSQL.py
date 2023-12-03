@@ -3,10 +3,9 @@ import psycopg2 as db
 
 # Connecting to the database and instantiating connection with server
 app = Flask(__name__)
-database = db.connect(database='santa', host='0.0.0.0', user='postgres', password='password', port=5434)
+database = db.connect(database='santa', host='postgres', user='postgres', password='password', port=5432)
 
 
-########################################### All important routes
 @app.route('/users', methods=['GET'])
 def get_all_users():
     cursor = database.cursor()
@@ -15,22 +14,6 @@ def get_all_users():
             SELECT * FROM users;
         '''
     )
-    result = cursor.fetchall()
-
-    cursor.close()
-
-    return json.dumps(result), 200
-
-
-@app.route('/groups', methods=['GET'])
-def get_all_groups():
-    cursor = database.cursor()
-    cursor.execute(
-        '''
-            SELECT * FROM groups;
-        '''
-    )
-
     result = cursor.fetchall()
 
     cursor.close()
@@ -59,6 +42,55 @@ def insert_user():
     cursor.close()
     
     return json.dumps(data), 200
+
+
+@app.route('/users/patch/<int:telegram_id>', methods=['PATCH'])
+def patch_user(telegram_id: int):
+    cursor = database.cursor()
+    cursor.execute(
+        '''
+            UPDATE users
+            SET username = "%s"
+            WHERE telegram_id = %d
+        ''' % ('not_stupid', telegram_id)
+    )
+
+    database.commit()
+    cursor.close()
+
+    return json.dumps({'telegram_id': telegram_id}), 200
+
+
+@app.route('/users/delete/<int:telegram_id>', methods=['DELETE'])
+def delete_user(telegram_id: int):
+    cursor = database.cursor()
+    cursor.execute(
+        '''
+            DELETE FROM users
+            WHERE telegram_id = %d
+        ''' % telegram_id
+    )
+
+    database.commit()
+    cursor.close()
+
+    return json.dumps({'telegram_id': telegram_id}), 200
+
+
+@app.route('/groups', methods=['GET'])
+def get_all_groups():
+    cursor = database.cursor()
+    cursor.execute(
+        '''
+            SELECT * FROM groups;
+        '''
+    )
+
+    result = cursor.fetchall()
+
+    cursor.close()
+
+    return json.dumps(result), 200
 
 
 @app.route('/groups/insert', methods=['POST'])
@@ -149,4 +181,4 @@ def get_recipients(telegram_id):
 
 # Run the backend
 if __name__ == '__main__':
-    app.run('localhost', 5051)
+    app.run('0.0.0.0', 5051)

@@ -1,10 +1,11 @@
 FROM python:3.8-alpine
 
-COPY ../requirements.txt ./app/requirements.txt
-WORKDIR /app
+RUN mkdir app
+COPY requirements.txt /app/requirements.txt
+COPY flask_MongoDB.py /app/flask_MongoDB.py
+WORKDIR /app/
 
-RUN pip install -r requirements.txt
-COPY ./flask_MongoDB.py /app/
+RUN pip install -r ./requirements.txt
 
 ENTRYPOINT [ "python" ]
-CMD [ "flask_PSQL.py" ]
+CMD [ "flask_MongoDB.py" ]

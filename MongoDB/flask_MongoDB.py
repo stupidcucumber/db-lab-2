@@ -3,28 +3,58 @@ import pymongo
 
 
 app = Flask(__name__)
-database = pymongo.MongoClient('mongodb://localhost:27017')['santa']
+client = pymongo.MongoClient(
+    'mongodb://mongodb:27017',
+    username='mongodb',
+    password='password'
+)
+
+print(client.server_info())
+
+database = client['santa']
 
 
 @app.route('/users', methods=['GET'])
 def get_all_users():
-    pass
+    result = database.users.find({})
+
+    return json.dumps(list(result), default=str), 200
 
 
 @app.route('/users/insert', methods=['POST'])
 def insert_user():
-    pass
+    data = request.get_json()
+    if data.get('telegram_id', None) is None or data.get('username', None) is None:
+        return json.dumps({}), 500
+    
+    _ = database.users.insert_one({
+        'telegram_id': data['telegram_id'],
+        'username': data['username'],
+        'about': data.get('about', '')
+    })
+
+    return json.dumps(data), 200
 
 
 @app.route('/users/delete/<int:id>', methods=['DELETE'])
 def delete_user(id: int):
-    pass
+    database.users.delete_one(
+        {
+            'telegram_id': id
+        }
+    )
+
+    return json.dumps({'telergam_id': id}), 200
 
 
-@app.route('/users/patch/<int:id>', methods=['PUT'])
+@app.route('/users/patch/<int:id>', methods=['PATCH'])
 def update_user(id: int):
-    pass
+    database.users.update_one({
+        'telegram_id':id
+    }, {'$set' : {'username': 'test_stupid'}})
+
+    return json.dumps({ '_id': id}), 200
 
 
 if __name__ == '__main__':
-    app.run('localhost', 5052)
+    app.run('0.0.0.0', 5052)

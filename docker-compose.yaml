@@ -9,14 +9,13 @@ services:
       - MONGO_INITDB=santa
     volumes:
       - ./MongoDB/mongodb-schema/:/docker-entrypoint-initdb.d/
-    ports:
-      - 27018:27017
+      - mongo-data:/data/db
 
   flask-mongo:
     build: ./MongoDB/
     restart: always
     ports:
-      - 5052:5051
+      - 5052:5052
 
   postgres:
     image: postgres
@@ -27,11 +26,23 @@ services:
       - POSTGRES_DB=santa
     volumes:
       - ./PostgreSQL/postgres-schema/:/docker-entrypoint-initdb.d/
-    ports:
-      - 5434:5432
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+          test: ["CMD-SHELL", "pg_isready -U postgres"]
+          interval: 5s
+          timeout: 5s
+          retries: 5
 
   flask-postgres:
+    depends_on:
+      postgres:
+        condition: service_healthy
+
     build: ./PostgreSQL/
     restart: always
     ports:
       - 5051:5051
+
+volumes:
+  mongo-data:
+  postgres-data:
